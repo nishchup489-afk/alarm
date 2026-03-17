@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Neon Alarm ⏰</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+<style>
+    body {
+        background: url("/static/robin.webp") no-repeat center center fixed;
+        background-size: cover;
+    }
+
+    .glass {
+        background: rgba(255,255,255,0.08);
+        backdrop-filter: blur(20px);
+        border: 1px solid rgba(255,255,255,0.15);
+    }
+
+    .glow {
+        box-shadow: 0 0 20px rgba(59,130,246,0.6);
+    }
+
+    .btn:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 25px rgba(99,102,241,0.8);
+    }
+</style>
+</head>
+
+<body class="min-h-screen flex items-center justify-center text-white">
+
+<div class="glass glow rounded-3xl p-8 w-full max-w-md text-center space-y-6">
+
+    <h1 class="text-3xl font-bold">⏰ Neon Clock</h1>
+
+    <!-- Tabs -->
+    <div class="flex justify-center gap-4">
+        <button id="alarmBtn" class="btn px-4 py-2 bg-blue-500 rounded-xl">Alarm</button>
+        <button id="timerBtn" class="btn px-4 py-2 bg-purple-500 rounded-xl">Timer</button>
+    </div>
+
+    <!-- ALARM -->
+    <div id="alarmSection">
+
+        <form id="alarm-form" action="/alarm" method="post" class="space-y-3">
+            <input type="time" step="1" id="alarm-time" name="alarm_time"
+                   class="w-full p-3 rounded-xl text-black" required>
+
+            <button class="w-full py-2 bg-indigo-500 rounded-xl btn">
+                Set Alarm
+            </button>
+        </form>
+
+        {% if result %}
+        <div class="mt-3 text-sm">
+            <p>Alarm: <span class="text-green-400">{{ result['alarm_set'] }}</span></p>
+        </div>
+        {% endif %}
+
+        <p class="mt-2">Now: <span id="clock"></span></p>
+
+    </div>
+
+    <!-- TIMER -->
+    <div id="timerSection" class="hidden space-y-3">
+
+        <input type="number" id="timer-input" placeholder="Seconds"
+               class="w-full p-3 rounded-xl text-black">
+
+        <button onclick="startTimer()" class="w-full py-2 bg-purple-500 rounded-xl btn">
+            Start Timer
+        </button>
+
+        <p id="timer-display" class="text-xl font-mono"></p>
+
+    </div>
+
+</div>
+
+<script>
+const alarmBtn = document.getElementById("alarmBtn");
+const timerBtn = document.getElementById("timerBtn");
+const alarmSection = document.getElementById("alarmSection");
+const timerSection = document.getElementById("timerSection");
+
+// toggle
+alarmBtn.onclick = () => {
+    alarmSection.classList.remove("hidden");
+    timerSection.classList.add("hidden");
+};
+
+timerBtn.onclick = () => {
+    timerSection.classList.remove("hidden");
+    alarmSection.classList.add("hidden");
+};
+
+// live clock
+setInterval(() => {
+    const now = new Date();
+    document.getElementById("clock").textContent =
+        now.toTimeString().slice(0, 8);
+}, 1000);
+
+// SAVE alarm
+document.getElementById("alarm-form").addEventListener("submit", () => {
+    const val = document.getElementById("alarm-time").value;
+    localStorage.setItem("alarmTime", val);
+});
+
+// RESTORE alarm
+const alarmTime = localStorage.getItem("alarmTime");
+if (alarmTime) {
+    document.getElementById("alarm-time").value = alarmTime;
+}
+
+// ALARM LOGIC
+if (alarmTime) {
+    const audio = new Audio("/static/alarm.mp3");
+
+    setInterval(() => {
+        const now = new Date().toTimeString().slice(0, 8);
+
+        if (now === alarmTime) {
+            audio.play();
+            alert("⏰ WAKE UP 🔥");
+        }
+    }, 1000);
+}
+
+// TIMER LOGIC
+function startTimer() {
+    let sec = parseInt(document.getElementById("timer-input").value);
+    const display = document.getElementById("timer-display");
+
+    const interval = setInterval(() => {
+        if (sec <= 0) {
+            clearInterval(interval);
+            alert("⏰ Timer Done!");
+            return;
+        }
+
+        let h = Math.floor(sec / 3600);
+        let m = Math.floor((sec % 3600) / 60);
+        let s = sec % 60;
+
+        display.textContent =
+            `${String(h).padStart(2,'0')}:` +
+            `${String(m).padStart(2,'0')}:` +
+            `${String(s).padStart(2,'0')}`;
+
+        sec--;
+    }, 1000);
+}
+</script>
+
+</body>
+</html>
