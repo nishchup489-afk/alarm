@@ -415,7 +415,6 @@ files = [
 [package.dependencies]
 typing-extensions = ">=4.14.1"
 
-
 [[package]]
 name = "python-multipart"
 version = "0.0.22"
@@ -497,4 +496,4 @@ standard = ["colorama (>=0.4) ; sys_platform == \"win32\"", "httptools (>=0.6.3)
 [metadata]
 lock-version = "2.1"
 python-versions = ">=3.10.0"
-content-hash = "1cea5969c970bb688517ce143e9d74610376ae59d0436bc7ecdfde4a344a6319"
+content-hash = "7594da40e58a123d6b05654d31e51db12f5788aa780a53720fbd50328f5adcc0"
